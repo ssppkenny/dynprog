@@ -1,6 +1,5 @@
 module Main
   ( main
-  , memoizedChange
   ) where
 
 import Lib
