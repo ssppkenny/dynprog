@@ -1,34 +1,37 @@
-module Main (main) where
+module Main
+  ( main
+  , memoizedChange) where
 
 import Lib
 
-import Data.Maybe ( catMaybes , isJust)
-import Data.List ( sort )
-import qualified Data.Map as Map
-import Data.Function.Memoize
+import Data.Maybe (catMaybes, isJust)
 
+coins :: [Int]
+coins = [1, 2, 5]
 
-coins = [1,2,5]
+shortestSolution :: [[Int]] -> [Int]
+shortestSolution = foldr1
+    (\x y ->
+       if length x < length y
+         then x
+         else y)
 
-memoized_fib :: Int -> Integer
-memoized_fib = (map fib [0 ..] !!)
-   where fib 0 = 0
-         fib 1 = 1
-         fib n = memoized_fib (n-2) + memoized_fib (n-1)
+memoizedChange :: Int -> Maybe [Int]
+memoizedChange = (map change [0 ..] !!)
+  where
+    change 0 = Just []
+    change amount =
+      if amount < minimum coins
+        then Nothing
+        else let solutions =
+                   [ (c, memoizedChange (amount - c))
+                   | c <- coins
+                   , amount - c >= 0
+                   ]
+                 results = filter (isJust . snd) solutions
+                 rs = map (uncurry addToList) results
+                 non_empty_solutions = catMaybes rs
+              in Just $ shortestSolution non_empty_solutions
 
-shortest_solution :: [[Int]] -> [Int]
-shortest_solution lst = foldr1 (\x y -> if length x < length y then x else y) lst
-
-memoized_change :: Int -> Maybe [Int]
-memoized_change = (map changeHelper' [0..] !!)
-    where changeHelper' 0 = Just []
-          changeHelper' amount = if amount < minimum coins then Nothing 
-                                                        else let 
-                                                            solutions = [(c, memoized_change (amount-c)) | c <- coins, amount - c >= 0]
-                                                            results = filter (\a -> (isJust (snd a))) solutions
-                                                            rs = map (\(x,y)-> addToList x y) results
-                                                            non_empty_solutions = catMaybes rs
-                                                                    in Just $ shortest_solution non_empty_solutions
-                    
 main :: IO ()
 main = someFunc
