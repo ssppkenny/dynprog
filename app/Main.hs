@@ -1,5 +1,6 @@
 module Main
   ( main
+  , memoizedChange
   ) where
 
 import Lib
@@ -33,6 +34,8 @@ memoizedChange = (map change [0 ..] !!)
                  rs = map (uncurry addToList) results
                  non_empty_solutions = catMaybes rs
               in Just $ shortestSolution non_empty_solutions
+
+change' coins amount = memoizedChange amount
 
 main :: IO ()
 main = someFunc
