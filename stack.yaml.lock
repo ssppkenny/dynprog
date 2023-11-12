@@ -18,6 +18,13 @@ packages:
       size: 2902
   original:
     hackage: containers-0.6.7
+- completed:
+    hackage: mtl-2.2.2@sha256:1050fb71acd9f5d67da7d992583f5bd0eb14407b9dc7acc122af1b738b706ca3,2261
+    pantry-tree:
+      sha256: b8bdc2259e2f943a7252fb164805666fe108ac959d398e0af27b43ba2ebc241c
+      size: 1713
+  original:
+    hackage: mtl-2.2.2
 snapshots:
 - completed:
     sha256: fb482b8e2d5d061cdda4ba1da2957c012740c893a5ee1c1b99001adae7b1fbe7

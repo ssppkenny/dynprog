@@ -48,6 +48,7 @@ executables:
     - coins
     - memoize
     - containers
+    - mtl
     when:
     - condition: false
       other-modules: Paths_coins
