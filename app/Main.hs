@@ -1,6 +1,7 @@
 module Main
   ( main
-  , memoizedChange) where
+  , memoizedChange
+  ) where
 
 import Lib
 
@@ -10,7 +11,8 @@ coins :: [Int]
 coins = [1, 2, 5]
 
 shortestSolution :: [[Int]] -> [Int]
-shortestSolution = foldr1
+shortestSolution =
+  foldr1
     (\x y ->
        if length x < length y
          then x
