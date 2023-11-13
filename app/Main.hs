@@ -1,14 +1,71 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Main
   ( main
   , memoizedChange
+  , mergeMaps
+  , initMap
+  , solve
+  , dynSolve
   ) where
 
 import Lib
 
-import Data.Maybe (catMaybes, isJust)
+import Data.IORef
+import qualified Data.Map as M
+import Data.Maybe (catMaybes, fromMaybe, isJust, isNothing)
 
 coins :: [Int]
 coins = [1, 2, 5]
+
+type MyMap = M.Map Int Int
+
+type DynMap = M.Map Int [Int]
+
+mergeMaps :: [DynMap] -> DynMap
+mergeMaps lst =
+  case lst of
+    [] -> M.empty
+    _ ->
+      foldl1
+        (M.unionWith
+           (\a b ->
+              if length a > length b
+                then a
+                else b))
+        lst
+
+initMap :: DynMap
+initMap = M.fromList [(0, [])]
+
+solve :: Int -> Int -> DynMap -> DynMap
+solve amount paid solutions =
+  if paid < amount
+    then case M.lookup paid solutions of
+           Just _ ->
+             let mergedSolutions =
+                   mergeMaps
+                     [ M.insert
+                       (paid + c)
+                       ((solutions M.! paid) ++ [c])
+                       solutions
+                     | c <- coins
+                     , paid + c <= amount
+                     , isNothing (M.lookup (paid + c) solutions)
+                         || length (M.lookup (paid + c) solutions)
+                              > length (M.lookup paid solutions) + 1
+                     ]
+              in solve
+                   amount
+                   (paid + 1)
+                   (if null mergedSolutions
+                      then solutions
+                      else mergedSolutions)
+           Nothing -> solve amount (paid + 1) solutions
+    else solutions
+
+dynSolve :: Int -> [Int]
+dynSolve amount = solve amount 0 initMap M.! amount
 
 shortestSolution :: [[Int]] -> [Int]
 shortestSolution =
@@ -35,7 +92,12 @@ memoizedChange = (map change [0 ..] !!)
                  non_empty_solutions = catMaybes rs
               in Just $ shortestSolution non_empty_solutions
 
-change' coins amount = memoizedChange amount
-
 main :: IO ()
-main = someFunc
+main = do
+  numRef <- newIORef @MyMap M.empty
+  current <- readIORef numRef
+  let newMap = M.insert 1 100 current
+  writeIORef numRef newMap
+  next <- readIORef numRef
+  let a = next M.! 1
+  print $ show a
