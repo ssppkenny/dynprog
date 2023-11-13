@@ -7,11 +7,14 @@ module Main
   , initMap
   , solve
   , dynSolve
+  , findSubset
+  , findSubsets
   ) where
 
 import Lib
 
 import Data.IORef
+import Data.List (partition)
 import qualified Data.Map as M
 import Data.Maybe (catMaybes, fromMaybe, isJust, isNothing)
 
@@ -21,6 +24,28 @@ coins = [1, 2, 5]
 type MyMap = M.Map Int Int
 
 type DynMap = M.Map Int [Int]
+
+findSubset :: Int -> [Int] -> Maybe [Int]
+findSubset s lst =
+  case lst of
+    [] -> Nothing
+    [_] -> Nothing
+    n:ns ->
+      if n == s
+        then Just [n]
+        else if n < s
+               then case findSubset (s - n) ns of
+                      Just t -> Just (n : t)
+                      Nothing -> findSubset s ns
+               else findSubset s ns
+
+findSubsets :: [Int] -> Maybe ([Int], [Int])
+findSubsets lst =
+  if even (sum lst)
+    then case findSubset (div (sum lst) 2) lst of
+           Just l -> Just $ partition (`elem` l) lst
+           Nothing -> Nothing
+    else Nothing
 
 mergeMaps :: [DynMap] -> DynMap
 mergeMaps lst =
