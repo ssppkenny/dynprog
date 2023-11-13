@@ -126,4 +126,5 @@ main = do
   writeIORef numRef newMap
   next <- readIORef numRef
   let a = next M.! 1
-  print $ show a
+  let res = findSubsets [2, 3, 5, 6]
+  print $ show res

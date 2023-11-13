@@ -10,7 +10,7 @@
             "name": "haskell(stack)",
             "internalConsoleOptions": "openOnSessionStart",
             "workspace": "${workspaceFolder}",
-            "startup": "${workspaceFolder}/test/Spec.hs",
+            "startup": "${workspaceFolder}/app/Main.hs",
             "startupFunc": "",
             "startupArgs": "",
             "stopOnEntry": true,
