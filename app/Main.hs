@@ -1,9 +1,9 @@
 {-# LANGUAGE TypeApplications #-}
+{-# OPTIONS_GHC -Wno-name-shadowing #-}
 
 module Main
   ( main
   , memoizedChange
-  , mergeMaps
   , initMap
   , solve
   , dynSolve
@@ -38,8 +38,8 @@ mergeMaps lst =
 initMap :: DynMap
 initMap = M.fromList [(0, [])]
 
-solve :: Int -> Int -> DynMap -> DynMap
-solve amount paid solutions =
+solve :: Int -> Int -> DynMap -> [Int] -> DynMap
+solve amount paid solutions coins =
   if paid < amount
     then case M.lookup paid solutions of
            Just _ ->
@@ -61,11 +61,12 @@ solve amount paid solutions =
                    (if null mergedSolutions
                       then solutions
                       else mergedSolutions)
-           Nothing -> solve amount (paid + 1) solutions
+                   coins
+           Nothing -> solve amount (paid + 1) solutions coins
     else solutions
 
-dynSolve :: Int -> [Int]
-dynSolve amount = solve amount 0 initMap M.! amount
+dynSolve :: Int -> [Int] -> [Int]
+dynSolve amount coins = solve amount 0 initMap coins M.! amount
 
 shortestSolution :: [[Int]] -> [Int]
 shortestSolution =
