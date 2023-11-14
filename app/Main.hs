@@ -118,21 +118,21 @@ memoizedChange = (map change [0 ..] !!)
                  non_empty_solutions = catMaybes rs
               in Just $ shortestSolution non_empty_solutions
 
+findMaxSubListSum :: [Int] -> Int
 findMaxSubListSum lst =
   case lst of
     [] -> 0
-    _ -> maximum $ loopiter lst []
-
-loopiter :: [Int] -> [Int] -> [Int]
-loopiter lst chunks =
-  case lst of
-    [] -> chunks
-    x:xs ->
-      if not (null chunks) && last chunks < 0
-        then loopiter xs (chunks ++ [x])
-        else if null chunks
-               then loopiter xs [x]
-               else loopiter xs (chunks ++ [last chunks + x])
+    _ ->
+      let loopiter lst chunks =
+            case lst of
+              [] -> chunks
+              x:xs ->
+                if not (null chunks) && last chunks < 0
+                  then loopiter xs (chunks ++ [x])
+                  else if null chunks
+                         then loopiter xs [x]
+                         else loopiter xs (chunks ++ [last chunks + x])
+       in maximum $ loopiter lst []
 
 main :: IO ()
 main = do
