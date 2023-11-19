@@ -32,6 +32,13 @@ packages:
       size: 2512
   original:
     hackage: transformers-0.5.6.2
+- completed:
+    hackage: split-0.2.4@sha256:e9f326f46b3daf2c1432e162c047388729e1ca746e0ca5c271b1d1b93c57f1e4,2614
+    pantry-tree:
+      sha256: 0e59550a8139f0e4f625113218accad71d326ab197ea871d6c44f4cd815b170c
+      size: 443
+  original:
+    hackage: split-0.2.4
 snapshots:
 - completed:
     sha256: a25fd287afcd300f35a2019a03c990169f7507ae0f43dfec763062c9ad891193

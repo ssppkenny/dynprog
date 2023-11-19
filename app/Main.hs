@@ -1,4 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 
 module Main
@@ -13,8 +15,10 @@ module Main
 
 import Lib
 
+import Control.Monad.Reader
 import Data.IORef
-import Data.List (partition)
+import Data.List (findIndices, partition)
+import Data.List.Split (splitWhen)
 import qualified Data.Map as M
 import Data.Maybe (catMaybes, fromMaybe, isJust, isNothing)
 
@@ -133,6 +137,54 @@ findMaxSubListSum lst =
                          then loopiter xs [x]
                          else loopiter xs (chunks ++ [last chunks + x])
        in maximum $ loopiter lst []
+
+findMaxSubListProd' :: ([Int], Int) -> Int
+findMaxSubListProd' p =
+  if even $ snd p
+    then product $ fst p
+    else max (product $ findLeft' $ fst p) (product $ findRight' $ fst p)
+
+countNegs lst' = length $ findIndices (< 0) lst'
+
+findMaxSubListProd :: [Int] -> Int
+findMaxSubListProd lst =
+  let splitByZero = splitWhen (== 0) lst
+      pairs = [(x, countNegs x) | x <- splitByZero]
+   in maximum [findMaxSubListProd' x | x <- pairs]
+
+findLeft' :: [Int] -> [Int]
+findLeft' lst =
+  let inds = findIndices (< 0) lst
+      pos = last inds
+   in take pos lst
+
+findRight' :: [Int] -> [Int]
+findRight' lst =
+  let inds = findIndices (< 0) lst
+      pos = head inds
+   in take pos lst
+
+changeReader :: Reader (Int, [Int]) [Int]
+changeReader = do
+  env <- ask
+  case env of
+    (amount, coins) ->
+      let memoizedChange' = (map change [0 ..] !!)
+            where
+              change 0 = Just []
+              change amount =
+                if amount < minimum coins
+                  then Nothing
+                  else let solutions =
+                             [ (c, memoizedChange' (amount - c))
+                             | c <- coins
+                             , amount - c >= 0
+                             ]
+                           results = filter (isJust . snd) solutions
+                           rs = map (uncurry addToList) results
+                           non_empty_solutions = catMaybes rs
+                        in Just $ shortestSolution non_empty_solutions
+       in return $ fromMaybe [] (memoizedChange' amount)
 
 main :: IO ()
 main = do

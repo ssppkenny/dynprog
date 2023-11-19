@@ -50,6 +50,7 @@ executables:
     - containers
     - mtl
     - transformers
+    - split
     when:
     - condition: false
       other-modules: Paths_coins
