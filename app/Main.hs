@@ -16,8 +16,9 @@ module Main
 import Lib
 
 import Control.Monad.Reader
+import Data.Function (on)
 import Data.IORef
-import Data.List (findIndices, partition)
+import Data.List (findIndices, maximumBy, partition)
 import Data.List.Split (splitWhen)
 import qualified Data.Map as M
 import Data.Maybe (catMaybes, fromMaybe, isJust, isNothing)
@@ -188,6 +189,23 @@ changeReader = do
 
 changeR :: Int -> [Int] -> Maybe [Int]
 changeR amount coins = Just $ runReader changeReader (amount, coins)
+
+substr :: String -> Int -> Int -> String
+substr s i j = drop i (take j s)
+
+longestPalindromSubstring :: String -> String
+longestPalindromSubstring s =
+  let len = length s
+      substrings =
+        [ substr s left (right + 1)
+        | left <- [0 .. len - 1]
+        , right <- [left .. len - 1]
+        , isPalindrom $ substr s left (right + 1)
+        ]
+   in maximumBy (compare `on` length) substrings
+
+isPalindrom :: String -> Bool
+isPalindrom s = s == reverse s
 
 main :: IO ()
 main = do
