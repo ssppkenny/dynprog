@@ -186,6 +186,9 @@ changeReader = do
                         in Just $ shortestSolution non_empty_solutions
        in return $ fromMaybe [] (memoizedChange' amount)
 
+changeR :: Int -> [Int] -> Maybe [Int]
+changeR amount coins = Just $ runReader changeReader (amount, coins)
+
 main :: IO ()
 main = do
   numRef <- newIORef @MyMap M.empty
