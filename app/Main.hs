@@ -207,6 +207,42 @@ longestPalindromSubstring s =
 isPalindrom :: String -> Bool
 isPalindrom s = s == reverse s
 
+longestPalindromeOdd :: String -> String
+longestPalindromeOdd s =
+  let len = length s
+      substrings =
+        [ substr s (center - x) (center + x + 1)
+        | center <- [0 .. len - 1]
+        , x <- [0 .. len - 1]
+        , center - x >= 0
+        , center + x < len
+        , substr s (center - x) (center - x + 1)
+            == substr s (center + x) (center + x + 1)
+        , isPalindrom $ substr s (center - x) (center + x + 1)
+        ]
+   in maximumBy (compare `on` length) substrings
+
+longestPalindromeEven :: String -> String
+longestPalindromeEven s =
+  let len = length s
+      substrings =
+        [ substr s (center - x) (center + x)
+        | center <- [1 .. len - 1]
+        , x <- [1 .. len - 1]
+        , center - x >= 0
+        , center + x <= len
+        , substr s (center - x) (center - x + 1)
+            == substr s (center + x - 1) (center + x)
+        , isPalindrom $ substr s (center - x) (center + x)
+        ]
+   in maximumBy (compare `on` length) substrings
+
+longestPalindrome :: String -> String
+longestPalindrome s =
+  let l1 = longestPalindromeEven s
+      l2 = longestPalindromeOdd s
+   in maximumBy (compare `on` length) [l1, l2]
+
 main :: IO ()
 main = do
   numRef <- newIORef @MyMap M.empty
