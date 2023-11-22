@@ -243,6 +243,40 @@ longestPalindrome s =
       l2 = longestPalindromeOdd s
    in maximumBy (compare `on` length) [l1, l2]
 
+longestEvenRec :: String -> Int -> Int -> String -> String
+longestEvenRec s center x acc =
+  let left = substr s (center - x) (center - x + 1)
+      right = substr s (center + x - 1) (center + x)
+      len = length s
+   in if left == right && (center - x) >= 0 && (center + x) <= len
+        then longestEvenRec s center (x + 1) (left ++ acc ++ right)
+        else acc
+
+longestOddRec :: String -> Int -> Int -> String -> String
+longestOddRec s center x acc =
+  let left = substr s (center - x) (center - x + 1)
+      right = substr s (center + x) (center + x + 1)
+      len = length s
+   in if left == right && (center - x) >= 0 && (center + x) < len
+        then longestOddRec s center (x + 1) (left ++ acc ++ right)
+        else acc
+
+longest' s =
+  let len = length s
+      substrings = [longestEvenRec s x 1 "" | x <- [0 .. len - 1]]
+   in maximumBy (compare `on` length) substrings
+
+longest s =
+  let len = length s
+      substrings =
+        [longestOddRec s x 1 (substr s x (x + 1)) | x <- [0 .. len - 1]]
+   in maximumBy (compare `on` length) substrings
+
+longestPalindromeSubstring s =
+  let l1 = longest s
+      l2 = longest' s
+   in maximumBy (compare `on` length) [l1, l2]
+
 main :: IO ()
 main = do
   numRef <- newIORef @MyMap M.empty
