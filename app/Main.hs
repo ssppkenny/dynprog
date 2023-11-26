@@ -311,17 +311,44 @@ memoizedBest'' n = max (memoizedBest' (n - 1)) (memoizedBest' n)
     memoizedBest' = \n -> values !! n
     values = [getBestEndingAt' j | j <- [0 ..]]
     getBestEndingAt' i =
-      if i == 0 || a ! i == '{'
+      if i == 0 || s !! i == '{'
         then 0
         else let middle_len = memoizedBest' (i - 1)
                  mirror = i - middle_len - 1
-              in if mirror >= 0 && a ! mirror == '{'
+              in if mirror >= 0 && s !! mirror == '{'
                    then let prefix_len =
                               if mirror > 0
                                 then memoizedBest' (mirror - 1)
                                 else 0
                          in prefix_len + middle_len + 2
                    else 0
+
+longestParenthesesReader :: Reader String Int
+longestParenthesesReader = do
+  s <- ask
+  let res = memoizedBest'' $ length s - 1
+        where
+          memoizedBest'' 0 = 0
+          memoizedBest'' n = max (memoizedBest' (n - 1)) (memoizedBest' n)
+            where
+              memoizedBest' = \n -> values !! n
+              values = [getBestEndingAt' j | j <- [0 ..]]
+              getBestEndingAt' i =
+                if i == 0 || s !! i == '{'
+                  then 0
+                  else let middle_len = memoizedBest' (i - 1)
+                           mirror = i - middle_len - 1
+                        in if mirror >= 0 && s !! mirror == '{'
+                             then let prefix_len =
+                                        if mirror > 0
+                                          then memoizedBest' (mirror - 1)
+                                          else 0
+                                   in prefix_len + middle_len + 2
+                             else 0
+  return res
+
+longestParenthesesR :: String -> Int
+longestParenthesesR s = runReader longestParenthesesReader s
 
 fibM = \n -> values !! n
   where
