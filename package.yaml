@@ -51,6 +51,7 @@ executables:
     - mtl
     - transformers
     - split
+    - array
     when:
     - condition: false
       other-modules: Paths_coins

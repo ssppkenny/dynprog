@@ -16,7 +16,10 @@ module Main
 import Lib
 
 import Control.Monad.Reader
+import Data.Array
 import Data.Function (on)
+import Data.Function (fix)
+import Data.Function.Memoize (memoize)
 import Data.IORef
 import Data.List (findIndices, maximumBy, partition)
 import Data.List.Split (splitWhen)
@@ -276,6 +279,56 @@ longestPalindromeSubstring s =
   let l1 = longest s
       l2 = longest' s
    in maximumBy (compare `on` length) [l1, l2]
+
+memoize1 :: (Int -> a) -> (Int -> a)
+memoize1 f = (map f [0 ..] !!)
+
+longestParentheses :: String -> Int
+longestParentheses s = maximum [memoizedBest i | i <- [0 .. length s - 1]]
+  where
+    memoizedBest = (map getBestEndingAt' [0 ..] !!)
+    getBestEndingAt' i =
+      if i == 0 || s !! i == '{'
+        then 0
+        else let middle_len = memoizedBest (i - 1)
+                 mirror = i - middle_len - 1
+              in if mirror >= 0 && s !! mirror == '{'
+                   then let prefix_len =
+                              if mirror > 0
+                                then memoizedBest (mirror - 1)
+                                else 0
+                         in prefix_len + middle_len + 2
+                   else 0
+
+s = (replicate 2000000 '{') ++ (replicate 10 '}')
+
+a = array (0, length s - 1) [(x, s !! x) | x <- [0 .. length s - 1]]
+
+memoizedBest'' :: Int -> Int
+memoizedBest'' 0 = 0
+memoizedBest'' n = max (memoizedBest' (n - 1)) (memoizedBest' n)
+  where
+    memoizedBest' = \n -> values !! n
+    values = [getBestEndingAt' j | j <- [0 ..]]
+    getBestEndingAt' i =
+      if i == 0 || a ! i == '{'
+        then 0
+        else let middle_len = memoizedBest' (i - 1)
+                 mirror = i - middle_len - 1
+              in if mirror >= 0 && a ! mirror == '{'
+                   then let prefix_len =
+                              if mirror > 0
+                                then memoizedBest' (mirror - 1)
+                                else 0
+                         in prefix_len + middle_len + 2
+                   else 0
+
+fibM = \n -> values !! n
+  where
+    values = [fibAux m | m <- [0 ..]]
+    fibAux n
+      | n <= 1 = n
+      | otherwise = fibM (n - 2) + fibM (n - 1)
 
 main :: IO ()
 main = do
