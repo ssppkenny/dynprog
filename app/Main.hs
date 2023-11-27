@@ -18,7 +18,6 @@ import Lib
 import Control.Monad.Reader
 import Data.Array
 import Data.Function (on)
-import Data.Function (fix)
 import Data.Function.Memoize (memoize)
 import Data.IORef
 import Data.List (findIndices, maximumBy, partition)
@@ -288,7 +287,7 @@ longestParenthesesReader = do
           memoizedBest'' 0 = 0
           memoizedBest'' n = max (memoizedBest' (n - 1)) (memoizedBest' n)
             where
-              memoizedBest' = \n -> values !! n
+              memoizedBest' = values !! n
               values = [getBestEndingAt' j | j <- [0 ..]]
               getBestEndingAt' i =
                 if i == 0 || s !! i == '{'
@@ -305,9 +304,9 @@ longestParenthesesReader = do
   return res
 
 longestParenthesesR :: String -> Int
-longestParenthesesR s = runReader longestParenthesesReader s
+longestParenthesesR = runReader longestParenthesesReader
 
-fibM = \n -> values !! n
+fibM = values !! n
   where
     values = [fibAux m | m <- [0 ..]]
     fibAux n
