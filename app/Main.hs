@@ -287,7 +287,7 @@ longestParenthesesReader = do
           memoizedBest'' 0 = 0
           memoizedBest'' n = max (memoizedBest' (n - 1)) (memoizedBest' n)
             where
-              memoizedBest' = values !! n
+              memoizedBest' n = values !! n
               values = [getBestEndingAt' j | j <- [0 ..]]
               getBestEndingAt' i =
                 if i == 0 || s !! i == '{'
@@ -306,7 +306,7 @@ longestParenthesesReader = do
 longestParenthesesR :: String -> Int
 longestParenthesesR = runReader longestParenthesesReader
 
-fibM = values !! n
+fibM n = values !! n
   where
     values = [fibAux m | m <- [0 ..]]
     fibAux n
